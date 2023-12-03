@@ -16,8 +16,25 @@ const PromptCardList = ({ data, handleTagClick }) => {
   )
 }
 
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return [debouncedValue, setDebouncedValue]
+}
+
 const Feed = () => {
   const [searchText, setSearchText] = useState('')
+  const [debouncedSearchText, setDebouncedValue] = useDebounce(searchText, 500)
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
@@ -29,9 +46,25 @@ const Feed = () => {
     fetchPosts()
   }, [])
 
+  useEffect(() => {
+    const searchPosts = async () => {
+      const response = await fetch(`/api/prompt?s=${debouncedSearchText}`);
+      const data = await response.json();
+      setPosts(data);
+    };
+
+    searchPosts();
+  }, [debouncedSearchText]);
+
   const handleSearchChange = (e) => {
     setSearchText(e.target.value)
   }
+
+  const handleTageClick = (tag) => {
+    setDebouncedValue(tag)
+    setSearchText(tag)
+  }
+
   return (
     <section className="feed">
       <form className='relative w-full flex-center'>
@@ -47,7 +80,7 @@ const Feed = () => {
 
       <PromptCardList
         data={posts}
-        handleTagClick={() => { }}
+        handleTagClick={handleTageClick}
       />
     </section>
   )

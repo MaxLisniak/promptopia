@@ -50,8 +50,8 @@ const UserProfile = () => {
 
   return (
     <Profile
-      name={`${selectedUser?.username}'s` || ""}
-      desc={`Welcome to ${selectedUser?.username}'s profile page`}
+      name={`${selectedUser?.username || "User"}'s` || ""}
+      desc={`Welcome to ${selectedUser?.username || "User"}'s profile page`}
       data={posts}
       handleEdit={handleEdit}
       handleDelete={handleDelete}
